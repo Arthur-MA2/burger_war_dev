@@ -22,7 +22,7 @@ import actionlib_msgs
 
 class NaviBot():
     def __init__(self):
-        
+
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
@@ -40,7 +40,7 @@ class NaviBot():
         goal.target_pose.pose.position.y = y
 
         # Euler to Quartanion
-        q=tf.transformations.quaternion_from_euler(0,0,yaw)        
+        q=tf.transformations.quaternion_from_euler(0,0,yaw)
         goal.target_pose.pose.orientation.x = q[0]
         goal.target_pose.pose.orientation.y = q[1]
         goal.target_pose.pose.orientation.z = q[2]
@@ -52,7 +52,7 @@ class NaviBot():
             rospy.logerr("Action server not available!")
             rospy.signal_shutdown("Action server not available!")
         else:
-            return self.client.get_result()        
+            return self.client.get_result()
 
 
     def strategy(self):
@@ -60,12 +60,12 @@ class NaviBot():
 
         self.setGoal(-0.5,0,0)
         self.setGoal(-0.5,0,3.1415/2)
-        
+
         self.setGoal(0,0.5,0)
         self.setGoal(0,0.5,3.1415)
-        
+
         self.setGoal(-0.5,0,-3.1415/2)
-        
+
         self.setGoal(0,-0.5,0)
         self.setGoal(0,-0.5,3.1415)
 

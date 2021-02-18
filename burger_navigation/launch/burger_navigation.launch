@@ -19,19 +19,22 @@
 
   <!-- AMCL -->
   <node pkg="amcl" type="amcl" name="amcl">
-    <param name="min_particles"             value="500"/>
-    <param name="max_particles"             value="3000"/>
-    <param name="kld_err"                   value="0.02"/>
-    <param name="update_min_d"              value="0.20"/>
-    <param name="update_min_a"              value="0.20"/>
-    <param name="resample_interval"         value="1"/>
-    <param name="transform_tolerance"       value="0.5"/>
-    <param name="recovery_alpha_slow"       value="0.00"/>
-    <param name="recovery_alpha_fast"       value="0.00"/>
+    <param name="min_particles"             value="100"/><!--500-->
+    <param name="max_particles"             value="1000"/><!--3000-->
+    <param name="kld_err"                   value="0.01"/><!--0.02-->
+    <param name="kld_z"                     value="0.99"/><!--0.99-->
+    <param name="update_min_d"              value="0.01"/><!--0.20-->
+    <param name="update_min_a"              value="0.087"/><!--0.20-->
+    <param name="resample_interval"         value="1"/><!--1-->
+    <param name="transform_tolerance"       value="0.5"/><!--0.5-->
+    <param name="recovery_alpha_slow"       value="0.001"/><!--0.00-->
+    <param name="recovery_alpha_fast"       value="0.1"/><!--0.00-->
     <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
     <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
     <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
-    <param name="gui_publish_rate"          value="50.0"/>
+    <param name="gui_publish_rate"          value="15.0"/><!--50.0-->
+    <param name="use_map_topic"             value="true"/><!--false-->
+    <param name="first_map_only"            value="true"/><!--false-->
 
     <remap from="scan"                      to="$(arg scan_topic)"/>
     <param name="laser_max_range"           value="3.5"/>
@@ -43,13 +46,13 @@
     <param name="laser_sigma_hit"           value="0.2"/>
     <param name="laser_lambda_short"        value="0.1"/>
     <param name="laser_likelihood_max_dist" value="2.0"/>
-    <param name="laser_model_type"          value="likelihood_field"/>
+    <param name="laser_model_type"          value="likelihood_field_prob"/><!--likelihood_field-->
 
     <param name="odom_model_type"           value="diff"/>
-    <param name="odom_alpha1"               value="0.1"/>
-    <param name="odom_alpha2"               value="0.1"/>
-    <param name="odom_alpha3"               value="0.1"/>
-    <param name="odom_alpha4"               value="0.1"/>
+    <param name="odom_alpha1"               value="0.4"/><!--0.1-->
+    <param name="odom_alpha2"               value="0.4"/><!--0.1-->
+    <param name="odom_alpha3"               value="0.4"/><!--0.1-->
+    <param name="odom_alpha4"               value="0.4"/><!--0.1-->
     <param name="odom_frame_id"             value="odom"/>
     <param name="base_frame_id"             value="base_footprint"/>
     <param name="global_frame_id"           value="map"/>
@@ -58,16 +61,18 @@
 
   <!-- move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    <!--param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" /-->
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
     <rosparam file="$(find burger_navigation)/param/costmap_common_params_burger.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find burger_navigation)/param/costmap_common_params_burger.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find burger_navigation)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find burger_navigation)/param/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find burger_navigation)/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find burger_navigation)/param/dwa_local_planner_params_burger.yaml" command="load" />
+    <!--rosparam file="$(find burger_navigation)/param/dwa_local_planner_params_burger.yaml" command="load" /-->
+    <rosparam file="$(find burger_navigation)/param/teb_local_planner_params_burger.yaml" command="load" />
     <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
     <remap from="odom" to="$(arg odom_topic)"/>
-    <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
+    <!--param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" /-->
 
     <param name="local_costmap/global_frame"             value="odom"/>
     <param name="local_costmap/robot_base_frame"             value="base_link"/>
@@ -78,7 +83,7 @@
   </node>
 
   <!-- rviz -->
-  <group if="$(arg open_rviz)"> 
+  <group if="$(arg open_rviz)">
     <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find burger_navigation)/rviz/burger_navigation.rviz">
       <remap from="/move_base_simple/goal" to="move_base_simple/goal"/>
     </node>
