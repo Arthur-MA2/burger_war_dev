@@ -40,48 +40,6 @@ class NaviBot:
 
         self.lookatEnemy_sub = rospy.Subscriber('lookatEnemy', Int32, self.lookatCallback, queue_size = 1)
 
-
-    def sample_setGoal(self,x,y,yaw):
-        self.client.wait_for_server()
-
-        goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = "map"
-        goal.target_pose.header.stamp = rospy.Time.now()
-        goal.target_pose.pose.position.x = x
-        goal.target_pose.pose.position.y = y
-
-        # Euler to Quartanion
-        q=tf.transformations.quaternion_from_euler(0,0,yaw)
-        goal.target_pose.pose.orientation.x = q[0]
-        goal.target_pose.pose.orientation.y = q[1]
-        goal.target_pose.pose.orientation.z = q[2]
-        goal.target_pose.pose.orientation.w = q[3]
-
-        self.client.send_goal(goal)
-        wait = self.client.wait_for_result()
-        if not wait:
-            rospy.logerr("Action server not available!")
-            rospy.signal_shutdown("Action server not available!")
-        else:
-            return self.client.get_result()
-
-
-    def sample_strategy(self):
-        r = rospy.Rate(5) # change speed 5fps
-
-        self.setGoal(-0.5,0,0)
-        self.setGoal(-0.5,0,3.1415/2)
-
-        self.setGoal(0,0.5,0)
-        self.setGoal(0,0.5,3.1415)
-
-        self.setGoal(-0.5,0,-3.1415/2)
-
-        self.setGoal(0,-0.5,0)
-        self.setGoal(0,-0.5,3.1415)
-
-        rospy.loginfo("FINISH!!!")
-
     def setGoal(self,goal_pose):#x,y,yaw):
         [x, y, yaw] = goal_pose
         self.client.wait_for_server()
@@ -154,16 +112,11 @@ class NaviBot:
 
         self.setGoal(waypoint[wp_count])
         while not rospy.is_shutdown():
-            rospy.loginfo("!!!Loop!!!")
             if self.diff_px_x_enemy != self.notfound and not self.findFlg:
-                rospy.loginfo("!!!True!!!")
                 self.findFlg = True
-                #self.client.cancel_goal()
                 self.client.cancel_all_goals()
                 twist.angular.z = - self.diff_px_x_enemy * kp
-                rospy.loginfo(twist.angular.z)
                 self.vel_pub.publish(twist)
-                #findFlg = False
             elif self.findFlg:
                 twist.angular.z = 0.0
                 self.vel_pub.publish(twist)
@@ -177,10 +130,8 @@ class NaviBot:
             rospy.loginfo(self.client.get_state())
 
             r.sleep()
-            #self.client.cancel_goal()
 
     def lookatCallback(self, data):
-        #self.findFlg = True
         self.diff_px_x_enemy = data.data
 
 

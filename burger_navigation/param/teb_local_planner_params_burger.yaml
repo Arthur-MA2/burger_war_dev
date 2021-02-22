@@ -6,8 +6,8 @@ TebLocalPlannerROS:
 
 
   # Robot Configuration Parameters
-  acc_lim_x: 2.5
-  acc_lim_theta: 1.5 #2.0
+  acc_lim_x: 2.0 #2.5
+  acc_lim_theta: 1.0 #1.5 #2.0
   max_vel_x: 0.22
   max_vel_x_backwards: 0.22
   max_vel_theta: 2.84
@@ -50,7 +50,7 @@ TebLocalPlannerROS:
   include_costmap_obstacles: false #true
   costmap_obstacles_behind_robot_dist: 1.0
   obstacle_poses_affected: 100 #30
-  inflation_dist: 0.0 #0.6
+  inflation_dist: 0.6 #0.0 #0.6
   include_dynamic_obstacles: false
   legacy_obstacle_association: false
   obstacle_association_force_inclusion_factor: 2.0
