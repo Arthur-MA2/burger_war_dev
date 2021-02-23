@@ -6,8 +6,8 @@ TebLocalPlannerROS:
 
 
   # Robot Configuration Parameters
-  acc_lim_x: 2.0 #2.5
-  acc_lim_theta: 1.0 #1.5 #2.0
+  acc_lim_x: 0.44 #2.0 #2.5
+  acc_lim_theta: 1.0 #0.2 #0.57 #1.0 #1.5 #2.0
   max_vel_x: 0.22
   max_vel_x_backwards: 0.22
   max_vel_theta: 2.84
@@ -27,7 +27,7 @@ TebLocalPlannerROS:
   # Goal Tolerance Parameters
   xy_goal_tolerance: 0.15 #0.1
   yaw_goal_tolerance: 0.26 #0.17
-  free_goal_vel: false
+  free_goal_vel: true #false
 
   # Trajectory Configuration Parameters
   teb_autosize: true

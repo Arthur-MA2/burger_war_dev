@@ -18,15 +18,6 @@ from actionlib_msgs.msg import GoalStatus
 # 0: PENDING,   1: ACTIVE,      2: PREEMPTED,    3: SUCCEEDED,  4: ABORTED,
 # 5: REJECTED,  6: PREEMPTING,  7: RECALLING,    8: RECALLED,   9: LOST
 
-
-# Ref: https://hotblackrobotics.github.io/en/blog/2018/01/29/action-client-py/
-
-#from std_msgs.msg import String
-#from sensor_msgs.msg import Image
-#from cv_bridge import CvBridge, CvBridgeError
-#import cv2
-
-
 class NaviBot:
     notfound = 404
     findFlg = False
@@ -34,13 +25,12 @@ class NaviBot:
 
     def __init__(self):
 
-        # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
         self.lookatEnemy_sub = rospy.Subscriber('lookatEnemy', Int32, self.lookatCallback, queue_size = 1)
 
-    def setGoal(self,goal_pose):#x,y,yaw):
+    def setGoal(self,goal_pose):
         [x, y, yaw] = goal_pose
         self.client.wait_for_server()
 
@@ -127,7 +117,6 @@ class NaviBot:
                     if wp_count >= wp_num:
                         wp_count = 0
                     self.setGoal(waypoint[wp_count])
-            rospy.loginfo(self.client.get_state())
 
             r.sleep()
 

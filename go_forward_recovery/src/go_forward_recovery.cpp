@@ -7,7 +7,6 @@ PLUGINLIB_EXPORT_CLASS(go_forward_recovery::GoForwardRecovery, nav_core::Recover
 namespace go_forward_recovery
 {
     GoForwardRecovery::GoForwardRecovery(): local_costmap_(NULL), initialized_(false), world_model_(NULL){
-        ROS_INFO("\e[0;32m !!!RECOVERY FORWARD!!!\e[0m");
     }
 
     GoForwardRecovery::~GoForwardRecovery(){
