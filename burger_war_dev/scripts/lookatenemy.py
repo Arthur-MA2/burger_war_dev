@@ -20,6 +20,7 @@ class LookatEnemy:
 
 
     notfound = 404
+    notfound_flg = False
     cam_img = np.zeros(shape_img)
     green_img = np.zeros(shape_img)
     rect_img = np.zeros(shape_img)
@@ -58,13 +59,18 @@ class LookatEnemy:
             x_bbox, y_bbox, w_bbox, h_bbox = cv2.boundingRect(maxCont)
 
             if h_bbox > self.hight_bbox_thrshld_lwr:
+                self.notfound_flg = False
                 self.rect_img = cv2.rectangle(image,(x_bbox, y_bbox),(x_bbox+w_bbox,y_bbox+h_bbox),(0,255,0),2)
                 return (x_bbox + w_bbox / 2.0) - self.width_img / 2.0
             else:
-                self.rect_img = np.zeros(self.shape_img)
+                if not self.notfound_flg:
+                    self.notfound_flg = True
+                    self.rect_img = np.zeros(self.shape_img)
                 return self.notfound
         else:
-            self.rect_img = np.zeros(self.shape_img)
+            if not self.notfound_flg:
+                self.notfound_flg = True
+                self.rect_img = np.zeros(self.shape_img)
             return self.notfound
 
 if __name__ == '__main__':
