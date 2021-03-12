@@ -17,13 +17,22 @@ from actionlib_msgs.msg import GoalStatus
 ### GoalStatus: http://docs.ros.org/en/kinetic/api/actionlib_msgs/html/msg/GoalStatus.html
 # 0: PENDING,   1: ACTIVE,      2: PREEMPTED,    3: SUCCEEDED,  4: ABORTED,
 # 5: REJECTED,  6: PREEMPTING,  7: RECALLING,    8: RECALLED,   9: LOST
+import time
 
 class NaviBot:
     notfound = 404
     findFlg = False
     diff_px_x_enemy = 0
 
+    lost_enemy_time = 0
+    elapsed_time = 0
+    lost_enemy_time_thrshld = 1.0
+    temp_lost_enemy_flg = False
+
     def __init__(self):
+
+        self.lost_enemy_time = time.time()
+        self.elapsed_time = time.time()
 
         self.vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
@@ -103,6 +112,11 @@ class NaviBot:
         self.setGoal(waypoint[wp_count])
         while not rospy.is_shutdown():
             if self.diff_px_x_enemy != self.notfound and not self.findFlg:
+                self.elapsed_time = time.time() - self.lost_enemy_time
+                if self.elapsed_time < self.lost_enemy_time_thrshld:
+                    self.temp_lost_enemy_flg = True
+                else:
+                    self.temp_lost_enemy_flg = False
                 self.findFlg = True
                 self.client.cancel_all_goals()
                 twist.angular.z = - self.diff_px_x_enemy * kp
@@ -110,10 +124,14 @@ class NaviBot:
             elif self.findFlg:
                 twist.angular.z = 0.0
                 self.vel_pub.publish(twist)
+                self.lost_enemy_time = time.time()
                 self.findFlg = False
             else:
-                if self.client.get_state() == GoalStatus.SUCCEEDED or self.client.get_state() == GoalStatus.PREEMPTED:
-                    wp_count += 1
+                if self.client.get_state() == GoalStatus.SUCCEEDED or self.client.get_state() == GoalStatus.PREEMPTED or self.client.get_state() == GoalStatus.ABORTED:
+                    if self.temp_lost_enemy_flg:
+                        self.temp_lost_enemy_flg = False
+                    else:
+                        wp_count += 1
                     if wp_count >= wp_num:
                         wp_count = 0
                     self.setGoal(waypoint[wp_count])

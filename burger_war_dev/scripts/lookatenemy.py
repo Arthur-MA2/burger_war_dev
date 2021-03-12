@@ -13,11 +13,23 @@ class LookatEnemy:
     height_img = 480
     ch_img = 3
     shape_img = height_img, width_img,ch_img
+    """for Simu
     h_thrshld_uppr = 90 #120
     h_thrshld_lwr  = 60 #42
+    s_thrshld_uppr = 255
     s_thrshld_lwr  = 100
+    v_thrshld_uppr = 255
+    v_thrshld_lwr  = 0
+    """
+    """for Real"""
+    h_thrshld_uppr = 90 #120
+    h_thrshld_lwr  = 50 #60 #42
+    s_thrshld_uppr = 150
+    s_thrshld_lwr  = 30 #70 #100
+    v_thrshld_uppr = 200
+    v_thrshld_lwr  = 100
+    """END for Real"""
     hight_bbox_thrshld_lwr = height_img * 0.25 #0.15 #0.2
-
 
     notfound = 404
     notfound_flg = False
@@ -47,8 +59,10 @@ class LookatEnemy:
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV_FULL)
         h = hsv[:, :, 0]
         s = hsv[:, :, 1]
+        v = hsv[:, :, 2]
         mask = np.zeros(h.shape, dtype=np.uint8)
-        mask[(self.h_thrshld_lwr < h) & (h < self.h_thrshld_uppr) & (s > self.s_thrshld_lwr)] = 255
+        #mask[(self.h_thrshld_lwr < h) & (h < self.h_thrshld_uppr) & (s > self.s_thrshld_lwr)] = 255
+        mask[(self.h_thrshld_lwr < h) & (h < self.h_thrshld_uppr) & (self.s_thrshld_lwr < s) & (s < self.s_thrshld_uppr) & (self.v_thrshld_lwr < v) & (v < self.v_thrshld_uppr)] = 255
         self.green_img, contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         circles = []
         if len(contours) > 0:
